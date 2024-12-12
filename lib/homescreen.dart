@@ -23,12 +23,13 @@ class _HomeScreenState extends State<HomeScreen> {
     futureNews = getNews(category: selectedCategory);
   }
 
-  void _updateCategory(String category) {
-    setState(() {
-      selectedCategory = category;
-      futureNews = getNews(category: selectedCategory);
-    });
-  }
+ void _updateCategory(String category) {
+  setState(() {
+    selectedCategory = category;
+    futureNews = getNews(category: selectedCategory); 
+  });
+}
+
 
   void _updateSearchQuery(String query) {
     setState(() {
@@ -38,24 +39,26 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: Center(child: const Text('NEWS HEADLINES',style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold),)),
+        backgroundColor: Colors.red,
+        title: Center(child: const Text('NEWS HEADLINES',style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold,color: Colors.black),)),
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-  mainAxisAlignment: MainAxisAlignment.spaceAround,
-  children: [
-    GestureDetector(
-      onTap: () => _updateCategory('bussines'),
-      child: Text("BUSSINES",
+Padding(
+  padding: const EdgeInsets.all(8.0),
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    children: [
+      GestureDetector(
+      onTap: () => _updateCategory('business'),
+      child: Text("BUSINESS",
           style: TextStyle(
             fontSize: 15,
-            color: selectedCategory == 'bussines' ? Colors.blue : Colors.black,
+            color: selectedCategory == 'business' ? Colors.black : Colors.red,
             fontWeight: FontWeight.bold,
           )),
     ),
@@ -64,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Text("ENTERTAINMENT",
           style: TextStyle(
             fontSize: 15,
-            color: selectedCategory == 'entertainment' ? Colors.blue : Colors.black,
+            color: selectedCategory == 'entertainment' ? Colors.black : Colors.red,
             fontWeight: FontWeight.bold,
           )),
     ),
@@ -73,26 +76,26 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Text("SPORTS",
           style: TextStyle(
             fontSize: 15,
-            color: selectedCategory == 'sports' ? Colors.blue : Colors.black,
+            color: selectedCategory == 'sports' ? Colors.black : Colors.red,
             fontWeight: FontWeight.bold,
           )),
     ),
-  ],
+    ],
+  ),
 ),
-
-          ),
           
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
-            
               controller: _searchController,
-              onChanged: _updateSearchQuery, 
+              onChanged: _updateSearchQuery,  
               decoration: InputDecoration(
                 labelText: 'Search News',
+                
+                
                 border: OutlineInputBorder(),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.search),
+                prefixIcon: IconButton(
+                  icon: const Icon(Icons.search,),
                   onPressed: () {
                     showSearch(
                       context: context,
@@ -127,38 +130,63 @@ class _HomeScreenState extends State<HomeScreen> {
                   return SingleChildScrollView(
                     child: Column(
                       children: articles.map((article) {
-                        return GestureDetector(
-                            onTap: (){
-                                Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            ArticleDetailPage(article: article),
-                      ),
-                    );
-                            },
-                            child: Container(
-                            margin: EdgeInsets.all(15),
+                        return Card(
+                          margin: const EdgeInsets.all(8.0),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
                             child: Column(
-                                children: [
-                                    ClipRRect(
-                                        borderRadius: BorderRadius.circular(15),
-                                      child: Image.network(article.urlToImage,
-                                      height: 250,
-                                      width: 400,
-                                      fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                    SizedBox(height: 10,),
-                                    Text(article.title,style: TextStyle(color: Colors.black,fontSize: 15,fontWeight: FontWeight.bold),),
-                                    Divider(thickness: 2,),
-                                ],
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                
+                                article.urlToImage.isNotEmpty
+                                    ? Image.network(
+                                        article.urlToImage,
+                                        width: double.infinity,
+                                        height: 200,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : const Icon(Icons.image_not_supported, size: 100),
+                                const SizedBox(height: 8),
+                                
+                                Text(
+                                  article.title,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                
+                                Text(
+                                  article.description,
+                                  style: const TextStyle(fontSize: 14),
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 8),
+                               
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              ArticleDetailPage(article: article),
+                                        ),
+                                      );
+                                    },
+                                    child: const Text('Read More'),
+                                  ),
+                                ),
+                              ],
                             ),
-                        ),
+                          ),
                         );
-                      }
-                      
-                      ).toList(),
+                      }).toList(),
                     ),
                   );
                 }
@@ -170,21 +198,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCategoryButton(
-      String label, IconData icon, String category) {
-    return GestureDetector(
-      onTap: () => _updateCategory(category),
-      child: Column(
-        children: [
-          Icon(icon, size: 30, color: selectedCategory == category ? Colors.blue : Colors.grey),
-          const SizedBox(height: 4),
-          Text(label,
-              style: TextStyle(
-                  color: selectedCategory == category ? Colors.blue : Colors.grey)),
-        ],
-      ),
-    );
-  }
+
+
 }
 
 class NewsSearchDelegate extends SearchDelegate {
@@ -217,56 +232,62 @@ class NewsSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    return FutureBuilder<List<NewsApiModel>>(
-      future: futureNews,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('No articles found.'));
-        } else {
-          final results = snapshot.data!.where((article) {
-            return article.title.toLowerCase().contains(query.toLowerCase()) ||
-                article.description.toLowerCase().contains(query.toLowerCase());
-          }).toList();
+    return Expanded(
+  child: FutureBuilder<List<NewsApiModel>>(
+    future: futureNews,
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      } else if (snapshot.hasError) {
+        return Center(child: Text('Error: ${snapshot.error}'));
+      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+        return const Center(child: Text('No articles found.'));
+      } else {
+        List<NewsApiModel> articles = snapshot.data!;
 
-          if (results.isEmpty) {
-            return const Center(child: Text('No articles match your search.'));
-          }
-
-          return ListView.builder(
-            itemCount: results.length,
-            itemBuilder: (context, index) {
-              final article = results[index];
-              return Card(
-                margin: const EdgeInsets.all(8.0),
-                child: ListTile(
-                  leading: article.urlToImage.isNotEmpty
-                      ? Image.network(article.urlToImage,
-                          width: 50, height: 50, fit: BoxFit.cover)
-                      : const Icon(Icons.image_not_supported),
-                  title: Text(article.title,
-                      maxLines: 2, overflow: TextOverflow.ellipsis),
-                  subtitle: Text(article.description,
-                      maxLines: 2, overflow: TextOverflow.ellipsis),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            ArticleDetailPage(article: article),
-                      ),
-                    );
-                  },
+        
+        return ListView.builder(
+          itemCount: articles.length,
+          itemBuilder: (context, index) {
+            final article = articles[index];
+            return Card(
+              margin: const EdgeInsets.all(8.0),
+              child: ListTile(
+                leading: article.urlToImage.isNotEmpty
+                    ? Image.network(
+                        article.urlToImage,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                      )
+                    : const Icon(Icons.image_not_supported),
+                title: Text(
+                  article.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              );
-            },
-          );
-        }
-      },
-    );
+                subtitle: Text(
+                  article.description,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ArticleDetailPage(article: article),
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        );
+      }
+    },
+  ),
+);
+
   }
 
   @override
